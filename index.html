@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agribusiness Strategy Dashboard | Maharashtra</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-venn@4.2.0/build/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2.3.0/dist/chartjs-chart-treemap.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body class="bg-[#FFFEFA] text-slate-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="#" target="_blank" rel="noopener noreferrer">
+                    <img src="images/recap-logo.png" alt="GIZ Logo" class="h-10">
+                </a>
+                <h1 class="text-xl md:text-2xl font-bold text-slate-800">NTFP / Agri-Value Chain Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-slate-500 hidden md:block"><strong>Landscape - </strong> Maharashtra</span>
+                <a href="https://www.giz.de/en/worldwide/344.html" target="_blank" rel="noopener noreferrer">
+                    <img src="images/teri-logo.png" alt="TERI Logo" class="h-7">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="summary" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-blue-900 mb-2">Strategic Agribusiness Opportunities in Maharashtra</h2>
+                <p class="max-w-3xl mx-auto text-slate-600">
+                    An interactive analysis of high-potential commodities across priority districts in Maharashtra. This dashboard highlights the primary bottleneck in their value chains and provides a strategic outlook for stakeholders.
+                p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-[1.6px] border-slate-300 flex flex-col justify-center h-full">
+                    <h3 class="font-bold text-lg mb-4 text-center text-slate-700">Value Chain Linkage Priority</h3>
+                    <p class="text-sm text-center text-slate-500 mb-4">Highlights whether the primary need is in strengthening supply (Backward), developing markets (Forward), or both.</p>
+                    <div class="chart-container relative h-64 w-full max-w-md mx-auto mb-4">
+                        <canvas id="linkageChart"></canvas>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg text-center">
+                        <p id="speciesCount" class="text-4xl font-bold text-blue-800">0</p>
+                        <p class="text-sm font-medium text-slate-600 mt-1">High-Potential Commodities</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg border-[1.6px] border-slate-300 flex flex-col justify-center h-full">
+                    <h3 class="font-bold text-lg mb-4 text-center text-slate-700">Top Product Categories</h3>
+                    <p class="text-sm text-center text-slate-500 mb-4">Frequency of high-potential categories across all commodities.</p>
+                    <div class="chart-container relative w-full h-80">
+                        <canvas id="categoryBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg border-[1.6px] border-slate-300 flex flex-col justify-center h-full">
+                    <h3 class="font-bold text-lg mb-4 text-center text-slate-700">District-wise Opportunity Distribution</h3>
+                    <p class="text-sm text-center text-slate-500 mb-4">Visualizes the number of high-potential commodities identified in each priority district.</p>
+                    <div class="chart-container relative w-full h-64">
+                        <canvas id="districtTreemapChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Re-architected explorer section with a two-pane layout -->
+        <section id="explorer" class="flex flex-col md:flex-row gap-8">
+
+            <!-- Left Filter Pane -->
+            <aside id="filter-pane" class="w-full md:w-1/4 lg:w-1/5 bg-white p-6 rounded-xl shadow-lg border border-slate-200 self-start sticky top-24">
+                <h3 class="text-xl font-bold text-blue-900 mb-6">Filter Explorer</h3>
+
+                <!-- UPDATED: District filter moved to the top -->
+                <div class="filter-group">
+                    <label for="districtFilter" class="filter-label">District</label>
+                    <select id="districtFilter" class="w-full p-2 rounded-md border border-slate-300 bg-white shadow-sm text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Commodity Type</label>
+                    <!-- UPDATED: Button padding changed from py-1.5 to py-1 -->
+                    <div id="productTypeFilterGroup" class="inline-flex rounded-md w-full" role="group">
+                        <button type="button" data-value="all" class="filter-button active-filter flex-1 px-3 py-1 text-xs font-medium rounded-l-lg">All</button>
+                        <button type="button" data-value="Existing NTFP" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium">Existing</button>
+                        <button type="button" data-value="Potential NTFP" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium">Potential</button>
+                        <button type="button" data-value="Farm Commodity" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium rounded-r-lg">Farm</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Value Chain Linkage</label>
+                    <!-- UPDATED: Button padding changed from py-1.5 to py-1 -->
+                    <div id="linkageFilterGroup" class="inline-flex rounded-md w-full" role="group">
+                        <button type="button" data-value="all" class="filter-button active-filter flex-1 px-3 py-1 text-xs font-medium rounded-l-lg">All</button>
+                        <button type="button" data-value="Backward" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium">Back</button>
+                        <button type="button" data-value="Forward" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium">Fwd</button>
+                        <button type="button" data-value="Integrated" class="filter-button inactive-filter flex-1 px-3 py-1 text-xs font-medium rounded-r-lg">Both</button>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Parts Used</label>
+                    <div id="partsFilterContainer" class="space-y-2">
+                         <!-- "All Parts" Checkbox -->
+                         <div class="flex items-center border-b border-slate-200 pb-2 mb-2">
+                            <input type="checkbox" id="all-parts-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            <label for="all-parts-checkbox" class="ml-2 text-sm font-bold text-slate-800 cursor-pointer">All Parts</label>
+                        </div>
+                        <!-- Individual checkboxes will be dynamically inserted here by script.js -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Content Pane -->
+            <div id="content-pane" class="w-full md:w-3/4 lg:w-4/5">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-wrap items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-2 shadow-sm text-xs">
+                        <div class="flex items-center gap-1"><span class="text-red-700 text-base">⬅️</span><span class="font-semibold">Backward</span></div>
+                        <div class="flex items-center gap-1"><span class="text-green-700 text-base">➡️</span><span class="font-semibold">Forward</span></div>
+                        <div class="flex items-center gap-1"><span class="text-blue-700 text-base">⬅️➡️</span><span class="font-semibold">Integrated</span></div>
+                    </div>
+                    <p id="resultsCount" class="text-right text-sm font-semibold text-slate-600"></p>
+                </div>
+                <div id="speciesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                 </div>
+            </div>
+        </section>
+
+        <section id="recommendations" class="mt-12">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-blue-900 mb-2">Strategy Recommendations for Stakeholders</h2>
+                <p class="max-w-3xl mx-auto text-slate-600">
+                     The report outlines specific strategies for key actors to unlock the value-addition potential in Maharashtra.
+                 </p>
+            </div>
+            <div id="recommendationsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-12 py-6 border-t">
+        <div class="container mx-auto text-center text-slate-500 text-sm">
+            <p>© 2025 Value Chain Explorer. Prepared by TERI.</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 modal-bg">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto modal-content transform scale-95">
+            <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+                <h3 id="modalTitle" class="text-xl font-bold text-blue-900"></h3>
+                 <button id="closeModal" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">×</button>
+            </div>
+            <div id="modalBody" class="p-6">
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATED: Template with smaller image and text for more compact cards -->
+    <template id="species-card-template">
+        <div class="card bg-white rounded-lg shadow border border-slate-100 flex flex-col cursor-pointer overflow-hidden" tabindex="0">
+            <div class="relative">
+                <img src="" alt="" class="w-full h-28 object-cover image">
+                <span title="" class="linkage-icon absolute top-2 right-2 text-lg rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 shadow-md"></span>
+            </div>
+            <div class="p-3 flex flex-col flex-grow">
+                <div class="flex-grow">
+                    <h4 class="font-bold text-base text-slate-800 mb-1 species-name"></h4>
+                    <p class="text-xs text-slate-400 italic mb-2 botanical-name"></p>
+                    <p class="text-xs text-slate-600 mb-2 line-clamp-2 strength"></p>
+                </div>
+                <div>
+                    <div class="mb-2 flex flex-wrap gap-1">
+                        <span class="product-type-tag text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+                        <span class="linkage-tag text-xs font-medium px-2 py-0.5 rounded-full"></span>
+                        <span class="category-tag text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full"></span>
+                    </div>
+                    <div class="district-tags flex flex-wrap gap-1"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <script src="js/script.js" defer></script>
+</body>
+</html>
